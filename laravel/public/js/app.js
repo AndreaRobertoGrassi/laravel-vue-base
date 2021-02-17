@@ -49798,9 +49798,13 @@ files.keys().map(function (key) {
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-var app = new Vue({
-  el: '#app'
-});
+function init() {
+  var app = new Vue({
+    el: '#app'
+  });
+}
+
+document.addEventListener("DOMContentLoaded", init);
 
 /***/ }),
 
