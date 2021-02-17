@@ -1936,10 +1936,17 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      open: false,
+      editFocus: '',
+      //contiene la parola dell'elemento che vado a modificare
       liked: false,
       postTitle: this.title,
       postContent: this.content,
@@ -1947,18 +1954,23 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
-    changeState: function changeState() {
-      this.open = !this.open;
-    },
     setLike: function setLike() {
       this.liked = !this.liked;
+    },
+    setEditFocus: function setEditFocus(elem) {
+      //valorizza editFocus
+      this.editFocus = elem;
+    },
+    isEditFocus: function isEditFocus(elem) {
+      //confrontiamo le due stringhe, se da falso deve sparire l'input
+      return this.editFocus === elem;
     }
   },
   computed: {
     shortContent: function shortContent() {
       //tronca il testo se ha più di 100 caratteri
       var maxLng = 100;
-      return this.content.length > maxLng && !this.open ? this.content.substring(0, 100) + '...' : this.content;
+      return this.content.length > maxLng ? this.content.substring(0, 100) + '...' : this.content;
     },
     heartCount: function heartCount() {
       //aumento i like se clicco sul cuore
@@ -37586,64 +37598,143 @@ var render = function() {
     _c("div", { staticClass: "row justify-content-center" }, [
       _c("div", { staticClass: "col-md-8" }, [
         _c("div", { staticClass: "card my-3" }, [
-          _c("div", { staticClass: "card-header" }, [
-            _c("h1", [_vm._v(_vm._s(_vm.title))]),
+          _c(
+            "div",
+            {
+              staticClass: "card-header",
+              on: {
+                click: function($event) {
+                  return _vm.setEditFocus("title")
+                }
+              }
+            },
+            [
+              _c(
+                "h1",
+                {
+                  directives: [
+                    {
+                      name: "show",
+                      rawName: "v-show",
+                      value: !_vm.isEditFocus("title"),
+                      expression: "!isEditFocus('title')"
+                    }
+                  ]
+                },
+                [_vm._v(_vm._s(_vm.title))]
+              ),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "show",
+                    rawName: "v-show",
+                    value: _vm.isEditFocus("title"),
+                    expression: "isEditFocus('title')"
+                  },
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.postTitle,
+                    expression: "postTitle"
+                  }
+                ],
+                attrs: { type: "text" },
+                domProps: { value: _vm.postTitle },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.postTitle = $event.target.value
+                  }
+                }
+              })
+            ]
+          ),
+          _vm._v(" "),
+          _c("div", { staticClass: "card-body" }, [
+            _c(
+              "p",
+              {
+                directives: [
+                  {
+                    name: "show",
+                    rawName: "v-show",
+                    value: !_vm.isEditFocus("content"),
+                    expression: "!isEditFocus('content')"
+                  }
+                ],
+                on: {
+                  click: function($event) {
+                    return _vm.setEditFocus("content")
+                  }
+                }
+              },
+              [_vm._v(_vm._s(_vm.shortContent) + " ")]
+            ),
             _vm._v(" "),
-            _c("input", {
+            _c("textarea", {
               directives: [
+                {
+                  name: "show",
+                  rawName: "v-show",
+                  value: _vm.isEditFocus("content"),
+                  expression: "isEditFocus('content')"
+                },
                 {
                   name: "model",
                   rawName: "v-model",
-                  value: _vm.postTitle,
-                  expression: "postTitle"
+                  value: _vm.postContent,
+                  expression: "postContent"
                 }
               ],
-              attrs: { type: "text" },
-              domProps: { value: _vm.postTitle },
+              attrs: { cols: "90", rows: "4" },
+              domProps: { value: _vm.postContent },
               on: {
                 input: function($event) {
                   if ($event.target.composing) {
                     return
                   }
-                  _vm.postTitle = $event.target.value
+                  _vm.postContent = $event.target.value
                 }
               }
-            })
-          ]),
-          _vm._v(" "),
-          _c(
-            "div",
-            {
-              staticClass: "card-body",
-              on: {
-                click: function($event) {
-                  return _vm.changeState()
-                }
-              }
-            },
-            [
-              _vm._v("\n                    " + _vm._s(_vm.shortContent) + " "),
-              _c("br"),
-              _c("br")
-            ]
-          ),
-          _vm._v(" "),
-          _c("div", { staticClass: "card-footer" }, [
+            }),
+            _vm._v(" "),
             _c(
-              "div",
+              "button",
               {
+                directives: [
+                  {
+                    name: "show",
+                    rawName: "v-show",
+                    value: !_vm.isEditFocus(""),
+                    expression: "!isEditFocus('')"
+                  }
+                ],
+                staticClass: "btn btn-primary",
                 on: {
                   click: function($event) {
-                    return _vm.setLike()
+                    return _vm.setEditFocus("")
                   }
                 }
               },
-              [
-                _c("strong", [_vm._v("Likes: " + _vm._s(_vm.heartCount))]),
-                _vm._v(" "),
-                _c("i", { staticClass: "fa-heart", class: _vm.heartIcon })
-              ]
+              [_vm._v("SAVE")]
             )
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "card-footer" }, [
+            _c("strong", [_vm._v("Likes: " + _vm._s(_vm.heartCount))]),
+            _vm._v(" "),
+            _c("i", {
+              staticClass: "fa-heart",
+              class: _vm.heartIcon,
+              on: {
+                click: function($event) {
+                  return _vm.setLike()
+                }
+              }
+            })
           ])
         ])
       ])
