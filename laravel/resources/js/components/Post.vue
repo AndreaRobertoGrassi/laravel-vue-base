@@ -2,15 +2,27 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <div class="card my-3" >
-                    <div class="card-header" @click="setEditFocus('title')">   <!--se clicco sul titolo posso modificarlo-->
+                <div class="card my-3" v-show="!deleted" >
 
-                        <h1 v-show="!isEditFocus('title')">{{ postTitle }}</h1>   <!--se clicco sul titolo sparisce il titolo e rimane solo l'input-->
+                    <div class="card-header" v-show="!sCreator">   <!--se clicco sul titolo posso modificarlo-->
+
+                        <h1 v-show="!isEditFocus('title')">      <!--se clicco sul titolo sparisce il titolo e rimane solo l'input-->
+                            <i class="fas fa-trash-alt" @click="destroy()"></i>
+                            <span @click="setEditFocus('title')">
+                                {{ postTitle }}
+                            </span>
+                            
+                        </h1>   
                         <input type="text" v-show="isEditFocus('title')" v-model="postTitle">     <!--se il parametro passato è uguale a ediFocus allora sarà visibile-->
                         
                     </div>
 
-                    <div class="card-body">     <!--rende visibile o meno l'intero testo-->
+                    <div class="card-header" v-show="sCreator">   <!--se clicco sul titolo posso modificarlo-->
+                        <h1>NEW POST</h1>
+                        <input type="text">     <!--se il parametro passato è uguale a ediFocus allora sarà visibile-->
+                    </div>
+
+                    <div class="card-body" v-show="!sCreator">     <!--rende visibile o meno l'intero testo-->
                         <p v-show="!isEditFocus('content')" @click="setEditFocus('content')">{{shortContent}} </p>
 
                         <textarea v-show="isEditFocus('content')" cols="90" rows="4" v-model="postContent"></textarea>
@@ -18,6 +30,14 @@
                         <button @click="update()" v-show="!isEditFocus('')" class="btn btn-primary">SAVE</button>
                         <button @click="cancel()" v-show="!isEditFocus('')" class="btn btn-danger">CANCEL</button>
                     </div>
+
+                    <div class="card-body" v-show="sCreator">     <!--rende visibile o meno l'intero testo-->
+
+                        <textarea cols="90" rows="4" v-model="postContent"></textarea>
+
+                        <button @click="update()" class="btn btn-primary">SAVE</button>
+                    </div>
+
                     <div class="card-footer">
                         
                         <strong>Likes: {{heartCount}}</strong>
@@ -37,6 +57,11 @@
     export default {
         data(){
             return {
+
+                sCreator: this.creator,
+
+                deleted:false,
+
                 editFocus: '',      //contiene la parola dell'elemento che vado a modificare
 
                 liked: false,
@@ -85,12 +110,19 @@
                 this.postTitle=this.uPostTitle;
 
                 this.setEditFocus('');
+            },
+            destroy: function(){
+                axios.get('/post/destroy/' + this.id)
+                    .then(res=>{
+                        this.deleted=true;
+                    })
+                    .catch(e=> console.log('Error'));
             }
         },
         computed:{
             shortContent:function(){          //tronca il testo se ha più di 100 caratteri
                 const maxLng=100;
-                return this.postContent.length > maxLng
+                return this.postContent!= undefined && this.postContent.length > maxLng
                     ? this.postContent.substring(0,maxLng) + '...'
                     : this.postContent;   
             },
@@ -108,7 +140,8 @@
             id:Number,
             title:String,
             content:String,
-            likes:Number
+            likes:Number,
+            creator: Boolean
         },
        
     }

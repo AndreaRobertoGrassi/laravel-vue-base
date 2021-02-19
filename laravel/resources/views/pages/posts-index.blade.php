@@ -1,15 +1,20 @@
 @extends('layouts.main-layout')
 @section('content')
-    <ul>
-        @foreach ($posts as $post)
+    <h1>Post</h1>
+    <post 
+        :creator="true"
+    ></post>
+    @foreach ($posts as $post)
+    
         
-            <post
-                :title="'{{$post-> title}}'"
-                :content="'{{$post-> content}}'"
-                :likes="{{$post-> likes}}"
-                :id="{{$post-> id}}"
-            ></post>
-        
-        @endforeach
-    </ul>
+        <post
+            :title="'{{$post-> title}}'"
+            :content="'{{$post-> content}}'"
+            :likes="{{$post-> likes}}"
+            :id="{{$post-> id}}"
+            :creator="false"
+        ></post>
+    
+    @endforeach
+
 @endsection
