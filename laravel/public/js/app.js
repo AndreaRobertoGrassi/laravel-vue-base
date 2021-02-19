@@ -1963,6 +1963,19 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -1973,8 +1986,11 @@ __webpack_require__.r(__webpack_exports__);
       liked: false,
       uPostTitle: this.title,
       uPostContent: this.content,
+      uPostLikes: this.likes,
       sPostTitle: this.title,
       sPostContent: this.content,
+      sPostLikes: this.likes,
+      postId: this.id,
       postTitle: this.title,
       postContent: this.content,
       postLikes: this.likes
@@ -1992,8 +2008,25 @@ __webpack_require__.r(__webpack_exports__);
       //confrontiamo le due stringhe, se da falso deve sparire l'input
       return this.editFocus === elem;
     },
-    update: function update() {
+    create: function create() {
       var _this = this;
+
+      var post = {
+        title: this.postTitle,
+        content: this.postContent
+      };
+      axios.post('/post/create', post).then(function (res) {
+        _this.postId = res.id;
+        _this.uPostTitle = _this.sPostTitle = res.title;
+        _this.uPostContent = _this.sPostContent = res.content;
+        _this.uPostLikes = _this.sPostLikes = 1;
+        _this.sCreator = false;
+      })["catch"](function (e) {
+        return console.log('errore', e);
+      });
+    },
+    update: function update() {
+      var _this2 = this;
 
       var post = {
         title: this.postTitle,
@@ -2001,8 +2034,8 @@ __webpack_require__.r(__webpack_exports__);
       };
       axios.post('/post/update/' + this.id, post).then(function (res) {
         console.log('response', res);
-        _this.uPostTitle = _this.sPostTitle = _this.postTitle;
-        _this.uPostContent = _this.sPostContent = _this.postContent;
+        _this2.uPostTitle = _this2.sPostTitle = _this2.postTitle;
+        _this2.uPostContent = _this2.sPostContent = _this2.postContent;
       })["catch"](function (e) {
         return console.log('errore', e);
       });
@@ -2014,10 +2047,10 @@ __webpack_require__.r(__webpack_exports__);
       this.setEditFocus('');
     },
     destroy: function destroy() {
-      var _this2 = this;
+      var _this3 = this;
 
       axios.get('/post/destroy/' + this.id).then(function (res) {
-        _this2.deleted = true;
+        _this3.deleted = true;
       })["catch"](function (e) {
         return console.log('Error');
       });
@@ -2031,7 +2064,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     heartCount: function heartCount() {
       //aumento i like se clicco sul cuore
-      return this.likes + (this.liked ? 1 : 0);
+      return this.sPostLikes + (this.liked ? 1 : 0);
     },
     heartIcon: function heartIcon() {
       //cuore pieno o vuoto se clicco
@@ -37769,9 +37802,28 @@ var render = function() {
                 staticClass: "card-header"
               },
               [
-                _c("h1", [_vm._v("NEW POST")]),
+                _c("span", [_vm._v("NEW POST")]),
                 _vm._v(" "),
-                _c("input", { attrs: { type: "text" } })
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.postTitle,
+                      expression: "postTitle"
+                    }
+                  ],
+                  attrs: { type: "text" },
+                  domProps: { value: _vm.postTitle },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.postTitle = $event.target.value
+                    }
+                  }
+                })
               ]
             ),
             _vm._v(" "),
@@ -37921,7 +37973,7 @@ var render = function() {
                     staticClass: "btn btn-primary",
                     on: {
                       click: function($event) {
-                        return _vm.update()
+                        return _vm.create()
                       }
                     }
                   },
@@ -37930,19 +37982,53 @@ var render = function() {
               ]
             ),
             _vm._v(" "),
-            _c("div", { staticClass: "card-footer" }, [
-              _c("strong", [_vm._v("Likes: " + _vm._s(_vm.heartCount))]),
-              _vm._v(" "),
-              _c("i", {
-                staticClass: "fa-heart",
-                class: _vm.heartIcon,
-                on: {
-                  click: function($event) {
-                    return _vm.setLike()
+            _c(
+              "div",
+              {
+                directives: [
+                  {
+                    name: "show",
+                    rawName: "v-show",
+                    value: !_vm.sCreator,
+                    expression: "!sCreator"
                   }
-                }
-              })
-            ])
+                ],
+                staticClass: "card-footer"
+              },
+              [
+                _c("strong", [_vm._v("Likes: " + _vm._s(_vm.heartCount))]),
+                _vm._v(" "),
+                _c("i", {
+                  staticClass: "fa-heart",
+                  class: _vm.heartIcon,
+                  on: {
+                    click: function($event) {
+                      return _vm.setLike()
+                    }
+                  }
+                })
+              ]
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              {
+                directives: [
+                  {
+                    name: "show",
+                    rawName: "v-show",
+                    value: _vm.sCreator,
+                    expression: "sCreator"
+                  }
+                ],
+                staticClass: "card-footer"
+              },
+              [
+                _c("strong", [_vm._v("Likes: 0")]),
+                _vm._v(" "),
+                _c("i", { staticClass: "fa-heart fas" })
+              ]
+            )
           ]
         )
       ])
@@ -50245,15 +50331,14 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 /*!******************************************!*\
   !*** ./resources/js/components/Post.vue ***!
   \******************************************/
-/*! no static exports found */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Post_vue_vue_type_template_id_5e8280ea___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Post.vue?vue&type=template&id=5e8280ea& */ "./resources/js/components/Post.vue?vue&type=template&id=5e8280ea&");
 /* harmony import */ var _Post_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Post.vue?vue&type=script&lang=js& */ "./resources/js/components/Post.vue?vue&type=script&lang=js&");
-/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _Post_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(["default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _Post_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
@@ -50283,7 +50368,7 @@ component.options.__file = "resources/js/components/Post.vue"
 /*!*******************************************************************!*\
   !*** ./resources/js/components/Post.vue?vue&type=script&lang=js& ***!
   \*******************************************************************/
-/*! no static exports found */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

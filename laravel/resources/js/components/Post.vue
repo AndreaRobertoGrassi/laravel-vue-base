@@ -4,6 +4,7 @@
             <div class="col-md-8">
                 <div class="card my-3" v-show="!deleted" >
 
+                    <!-- READ -->
                     <div class="card-header" v-show="!sCreator">   <!--se clicco sul titolo posso modificarlo-->
 
                         <h1 v-show="!isEditFocus('title')">      <!--se clicco sul titolo sparisce il titolo e rimane solo l'input-->
@@ -17,11 +18,13 @@
                         
                     </div>
 
+                    <!-- WRITE -->
                     <div class="card-header" v-show="sCreator">   <!--se clicco sul titolo posso modificarlo-->
-                        <h1>NEW POST</h1>
-                        <input type="text">     <!--se il parametro passato è uguale a ediFocus allora sarà visibile-->
+                        <span>NEW POST</span>
+                        <input type="text" v-model="postTitle">     <!--se il parametro passato è uguale a ediFocus allora sarà visibile-->
                     </div>
 
+                     <!-- READ -->
                     <div class="card-body" v-show="!sCreator">     <!--rende visibile o meno l'intero testo-->
                         <p v-show="!isEditFocus('content')" @click="setEditFocus('content')">{{shortContent}} </p>
 
@@ -30,18 +33,28 @@
                         <button @click="update()" v-show="!isEditFocus('')" class="btn btn-primary">SAVE</button>
                         <button @click="cancel()" v-show="!isEditFocus('')" class="btn btn-danger">CANCEL</button>
                     </div>
-
+                    
+                    <!-- WRITE -->
                     <div class="card-body" v-show="sCreator">     <!--rende visibile o meno l'intero testo-->
 
                         <textarea cols="90" rows="4" v-model="postContent"></textarea>
 
-                        <button @click="update()" class="btn btn-primary">SAVE</button>
+                        <button @click="create()" class="btn btn-primary">SAVE</button>
                     </div>
 
-                    <div class="card-footer">
+                     <!-- READ -->
+                    <div class="card-footer" v-show="!sCreator">
                         
                         <strong>Likes: {{heartCount}}</strong>
                         <i class="fa-heart" :class="heartIcon" @click="setLike()"></i>       <!--far: cuore vuoto, fas: pieno-->
+                    
+                    </div>
+                    
+                    <!-- WRITE -->
+                    <div class="card-footer" v-show="sCreator">
+                        
+                        <strong>Likes: 0</strong>
+                        <i class="fa-heart fas"></i>       <!--far: cuore vuoto, fas: pieno-->
                     
                     </div>
                 </div>
@@ -59,7 +72,7 @@
             return {
 
                 sCreator: this.creator,
-
+               
                 deleted:false,
 
                 editFocus: '',      //contiene la parola dell'elemento che vado a modificare
@@ -68,10 +81,13 @@
 
                 uPostTitle:this.title,
                 uPostContent:this.content,
+                uPostLikes:this.likes,
 
                 sPostTitle:this.title,
                 sPostContent:this.content,
+                sPostLikes:this.likes,
 
+                postId:this.id,
                 postTitle: this.title,
                 postContent: this.content,
                 postLikes: this.likes
@@ -89,6 +105,21 @@
             },
             isEditFocus:function(elem){      //confrontiamo le due stringhe, se da falso deve sparire l'input
                 return this.editFocus===elem;
+            },
+            create:function(){
+                const post={
+                    title: this.postTitle,
+                    content: this.postContent
+                };
+                axios.post('/post/create', post)
+                    .then(res=> {
+                        this.postId=res.id;
+                        this.uPostTitle = this.sPostTitle = res.title;
+                        this.uPostContent = this.sPostContent = res.content;
+                        this.uPostLikes = this.sPostLikes = 1;
+                        this.sCreator=false;
+                    })
+                    .catch(e=>console.log('errore', e));
             },
             update:function(){
                 const post={
@@ -128,7 +159,7 @@
             },
  
             heartCount:function(){       //aumento i like se clicco sul cuore
-                return this.likes + (this.liked ? 1 : 0);
+                return this.sPostLikes + (this.liked ? 1 : 0);
             },
 
             heartIcon: function(){     //cuore pieno o vuoto se clicco
