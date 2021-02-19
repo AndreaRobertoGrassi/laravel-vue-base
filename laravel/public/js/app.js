@@ -2011,6 +2011,7 @@ __webpack_require__.r(__webpack_exports__);
     create: function create() {
       var _this = this;
 
+      //crea un nuovo post
       var post = {
         title: this.postTitle,
         content: this.postContent
@@ -2028,6 +2029,7 @@ __webpack_require__.r(__webpack_exports__);
     update: function update() {
       var _this2 = this;
 
+      //salvo il nuovo post o le modifiche
       var post = {
         title: this.postTitle,
         content: this.postContent
@@ -2042,6 +2044,7 @@ __webpack_require__.r(__webpack_exports__);
       this.setEditFocus('');
     },
     cancel: function cancel() {
+      //cancella le modifiche al post
       this.postContent = this.uPostContent;
       this.postTitle = this.uPostTitle;
       this.setEditFocus('');
@@ -2049,6 +2052,7 @@ __webpack_require__.r(__webpack_exports__);
     destroy: function destroy() {
       var _this3 = this;
 
+      //elimina il post
       axios.get('/post/destroy/' + this.id).then(function (res) {
         _this3.deleted = true;
       })["catch"](function (e) {

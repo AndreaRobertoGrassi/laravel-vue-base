@@ -5,7 +5,7 @@
                 <div class="card my-3" v-show="!deleted" >
 
                     <!-- READ -->
-                    <div class="card-header" v-show="!sCreator">   <!--se clicco sul titolo posso modificarlo-->
+                    <div class="card-header" v-show="!sCreator"> 
 
                         <h1 v-show="!isEditFocus('title')">      <!--se clicco sul titolo sparisce il titolo e rimane solo l'input-->
                             <i class="fas fa-trash-alt" @click="destroy()"></i>
@@ -14,24 +14,24 @@
                             </span>
                             
                         </h1>   
-                        <input type="text" v-show="isEditFocus('title')" v-model="postTitle">     <!--se il parametro passato è uguale a ediFocus allora sarà visibile-->
+                        <input type="text" v-show="isEditFocus('title')" v-model="postTitle">     <!--se il parametro passato è uguale a editFocus allora sarà visibile-->
                         
                     </div>
 
                     <!-- WRITE -->
-                    <div class="card-header" v-show="sCreator">   <!--se clicco sul titolo posso modificarlo-->
+                    <div class="card-header" v-show="sCreator">
                         <span>NEW POST</span>
-                        <input type="text" v-model="postTitle">     <!--se il parametro passato è uguale a ediFocus allora sarà visibile-->
+                        <input type="text" v-model="postTitle"> <!-- input titolo nuovo post-->  
                     </div>
 
                      <!-- READ -->
-                    <div class="card-body" v-show="!sCreator">     <!--rende visibile o meno l'intero testo-->
+                    <div class="card-body" v-show="!sCreator">    
                         <p v-show="!isEditFocus('content')" @click="setEditFocus('content')">{{shortContent}} </p>
 
                         <textarea v-show="isEditFocus('content')" cols="90" rows="4" v-model="postContent"></textarea>
 
-                        <button @click="update()" v-show="!isEditFocus('')" class="btn btn-primary">SAVE</button>
-                        <button @click="cancel()" v-show="!isEditFocus('')" class="btn btn-danger">CANCEL</button>
+                        <button @click="update()" v-show="!isEditFocus('')" class="btn btn-primary">SAVE</button>    <!--salvare le modifiche -->
+                        <button @click="cancel()" v-show="!isEditFocus('')" class="btn btn-danger">CANCEL</button>    <!--cancellare le modifiche -->
                     </div>
                     
                     <!-- WRITE -->
@@ -39,7 +39,7 @@
 
                         <textarea cols="90" rows="4" v-model="postContent"></textarea>
 
-                        <button @click="create()" class="btn btn-primary">SAVE</button>
+                        <button @click="create()" class="btn btn-primary">SAVE</button>          <!--salvare il nuovo post-->
                     </div>
 
                      <!-- READ -->
@@ -70,7 +70,6 @@
     export default {
         data(){
             return {
-
                 sCreator: this.creator,
                
                 deleted:false,
@@ -100,13 +99,16 @@
             setLike:function(){
                 this.liked= !this.liked;
             },
+
             setEditFocus:function(elem){     //valorizza editFocus
                 this.editFocus=elem;
             },
+
             isEditFocus:function(elem){      //confrontiamo le due stringhe, se da falso deve sparire l'input
                 return this.editFocus===elem;
             },
-            create:function(){
+
+            create:function(){       //crea un nuovo post
                 const post={
                     title: this.postTitle,
                     content: this.postContent
@@ -121,7 +123,8 @@
                     })
                     .catch(e=>console.log('errore', e));
             },
-            update:function(){
+
+            update:function(){             //salvo il nuovo post o le modifiche
                 const post={
                     title: this.postTitle,
                     content: this.postContent
@@ -136,13 +139,15 @@
                     
                 this.setEditFocus('')
             },
-            cancel:function(){
+
+            cancel:function(){              //cancella le modifiche al post
                 this.postContent=this.uPostContent;
                 this.postTitle=this.uPostTitle;
 
                 this.setEditFocus('');
             },
-            destroy: function(){
+
+            destroy: function(){          //elimina il post
                 axios.get('/post/destroy/' + this.id)
                     .then(res=>{
                         this.deleted=true;
@@ -150,6 +155,7 @@
                     .catch(e=> console.log('Error'));
             }
         },
+
         computed:{
             shortContent:function(){          //tronca il testo se ha più di 100 caratteri
                 const maxLng=100;
@@ -167,6 +173,7 @@
             }
             
         },
+        
         props:{
             id:Number,
             title:String,
