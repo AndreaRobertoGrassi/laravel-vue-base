@@ -7,6 +7,7 @@
                 :title="'{{$post-> title}}'"
                 :content="'{{$post-> content}}'"
                 :likes="{{$post-> likes}}"
+                :id="{{$post-> id}}"
             ></post>
         
         @endforeach

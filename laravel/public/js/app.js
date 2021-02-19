@@ -1948,6 +1948,8 @@ __webpack_require__.r(__webpack_exports__);
       editFocus: '',
       //contiene la parola dell'elemento che vado a modificare
       liked: false,
+      sPostTitle: this.title,
+      sPostContent: this.content,
       postTitle: this.title,
       postContent: this.content,
       postLikes: this.likes
@@ -1964,13 +1966,29 @@ __webpack_require__.r(__webpack_exports__);
     isEditFocus: function isEditFocus(elem) {
       //confrontiamo le due stringhe, se da falso deve sparire l'input
       return this.editFocus === elem;
+    },
+    update: function update() {
+      var _this = this;
+
+      var post = {
+        title: this.postTitle,
+        content: this.postContent
+      };
+      axios.post('/post/update/' + this.id, post).then(function (res) {
+        console.log('response', res);
+        _this.sPostTitle = _this.postTitle;
+        _this.sPostContent = _this.postContent;
+      })["catch"](function (e) {
+        return console.log('errore', e);
+      });
+      this.setEditFocus('');
     }
   },
   computed: {
     shortContent: function shortContent() {
       //tronca il testo se ha più di 100 caratteri
       var maxLng = 100;
-      return this.content.length > maxLng ? this.content.substring(0, 100) + '...' : this.content;
+      return this.sPostContent.length > maxLng ? this.sPostContent.substring(0, maxLng) + '...' : this.sPostContent;
     },
     heartCount: function heartCount() {
       //aumento i like se clicco sul cuore
@@ -1982,6 +2000,7 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   props: {
+    id: Number,
     title: String,
     content: String,
     likes: Number
@@ -37621,7 +37640,7 @@ var render = function() {
                     }
                   ]
                 },
-                [_vm._v(_vm._s(_vm.title))]
+                [_vm._v(_vm._s(_vm.sPostTitle))]
               ),
               _vm._v(" "),
               _c("input", {
@@ -37715,7 +37734,7 @@ var render = function() {
                 staticClass: "btn btn-primary",
                 on: {
                   click: function($event) {
-                    return _vm.setEditFocus("")
+                    return _vm.update()
                   }
                 }
               },
